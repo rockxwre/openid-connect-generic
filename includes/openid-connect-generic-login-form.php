@@ -28,6 +28,7 @@ class OpenID_Connect_Generic_Login_Form {
 		
 		// add a shortcode for the login button
 		add_shortcode( 'openid_connect_generic_login_button', array( $login_form, 'make_login_button' ) );
+		add_shortcode( 'openid_connect_generic_login_logout_button', array( $login_form, 'make_login_logout_button' ) );
 		
 		$login_form->handle_redirect_cookie();
 		$login_form->handle_redirect_login_type_auto();
@@ -130,6 +131,25 @@ class OpenID_Connect_Generic_Login_Form {
 		
 		ob_start();
 		?>
+		<div class="openid-connect-login-button" style="margin: 1em 0; text-align: center;">
+			<a class="button button-large" href="<?php print esc_url( $href ); ?>"><?php print $text; ?></a>
+		</div>
+		<?php
+		return ob_get_clean();
+	}
+	
+	/**
+	 * Creates a login button when logout or a logout button when logged in.
+	 *
+	 * @return string
+	 */
+	function make_login_logout_button() {
+        $current_user = wp_get_current_user();
+        $loggedIn = ( 0 !== $current_user->ID );
+        $text = ( $loggedIn ? apply_filters( 'openid-connect-generic-logout-button-text', __( 'Logout ' . $current_user->display_name), $current_user->display_name ) : apply_filters('openid-connect-generic-login-button-text', __( 'Login with OpenID Connect' ) ) );
+        $href = ( $loggedIn ? wp_logout_url( home_url() ) : $this->client_wrapper->get_authentication_url() );
+	    ob_start();
+	    ?>
 		<div class="openid-connect-login-button" style="margin: 1em 0; text-align: center;">
 			<a class="button button-large" href="<?php print esc_url( $href ); ?>"><?php print $text; ?></a>
 		</div>
